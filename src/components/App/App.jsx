@@ -1,18 +1,19 @@
-import { useState, useEffect } from 'react';
-import css from './App.module.css';
-import ContactForm from "../ContactForm/ContactForm"
-import SearchBox from "../SearchBox/SearchBox"
-import ContactList from "../ContactList/ContactList"
-import contactsData from "../../contacts.json"
-
+import { useState, useEffect } from "react";
+import initialContacts from "../../contacts.json";
+import ContactList from "../ContactList/ContactList";
+import SearchBox from "../SearchBox/SearchBox";
+import ContactForm from "../ContactForm/ContactForm";
+import "./App.css";
 
 export default function App() {
   const [contacts, setContacts] = useState(() => {
-    const savedContacts = localStorage.getItem("contacts");
-
-    return savedContacts !== null ? JSON.parse(savedContacts) : contactsData;
+    const savedContacts = window.localStorage.getItem("saved-contacts");
+    if (savedContacts !== null) {
+      return JSON.parse(savedContacts);
+    }
+    return initialContacts;
   });
-  const [filter, setFilter] = useState('');
+  const [filter, setFilter] = useState("");
 
   const addContact = (newContact) => {
     setContacts((prevContacts) => {
@@ -27,20 +28,19 @@ export default function App() {
   };
 
   const visibleContacts = contacts.filter((contact) =>
-    contact.name.toLowerCase().includes(filter.toLowerCase())
+    contact.name.toLocaleLowerCase().includes(filter.toLocaleLowerCase())
   );
 
   useEffect(() => {
-    localStorage.setItem("contacts", JSON.stringify(visibleContacts))
-  })
-
+    window.localStorage.setItem("saved-contacts", JSON.stringify(contacts));
+  }, [contacts]);
 
   return (
     <div>
-      <h1 className={css.header}>Phonebook</h1>
-      <ContactForm onAdd={addContact}/>
-      <SearchBox value={filter} onFilter={setFilter}/>
-      <ContactList contacts={visibleContacts} onDelete={deleteContact}/>
+      <h1>Phonebook</h1>
+      <ContactForm onAdd={addContact} />
+      <SearchBox value={filter} onFilter={setFilter} />
+      <ContactList contacts={visibleContacts} onDelete={deleteContact} />
     </div>
   );
 }
