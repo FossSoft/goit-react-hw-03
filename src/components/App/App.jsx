@@ -1,17 +1,15 @@
 import { useState, useEffect } from "react";
-import initialContacts from "../../contacts.json";
-import ContactList from "../ContactList/ContactList";
-import SearchBox from "../SearchBox/SearchBox";
+import css from "./App.module.css";
 import ContactForm from "../ContactForm/ContactForm";
-import "./App.css";
+import SearchBox from "../SearchBox/SearchBox";
+import ContactList from "../ContactList/ContactList";
+import contactsData from "../../contacts.json";
 
 export default function App() {
   const [contacts, setContacts] = useState(() => {
-    const savedContacts = window.localStorage.getItem("saved-contacts");
-    if (savedContacts !== null) {
-      return JSON.parse(savedContacts);
-    }
-    return initialContacts;
+    const savedContacts = localStorage.getItem("contacts");
+
+    return savedContacts !== null ? JSON.parse(savedContacts) : contactsData;
   });
   const [filter, setFilter] = useState("");
 
@@ -28,16 +26,16 @@ export default function App() {
   };
 
   const visibleContacts = contacts.filter((contact) =>
-    contact.name.toLocaleLowerCase().includes(filter.toLocaleLowerCase())
+    contact.name.toLowerCase().includes(filter.toLowerCase())
   );
 
   useEffect(() => {
-    window.localStorage.setItem("saved-contacts", JSON.stringify(contacts));
-  }, [contacts]);
+    localStorage.setItem("contacts", JSON.stringify(visibleContacts));
+  });
 
   return (
     <div>
-      <h1>Phonebook</h1>
+      <h1 className={css.header}>Phonebook</h1>
       <ContactForm onAdd={addContact} />
       <SearchBox value={filter} onFilter={setFilter} />
       <ContactList contacts={visibleContacts} onDelete={deleteContact} />
